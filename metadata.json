@@ -1,0 +1,6 @@
+{
+  "name": "AjudaJá - Serviços Rápidos e Confiáveis em Angola",
+  "description": "Plataforma completa de contratação e prestação de serviços para Angola. Conectamos clientes a canalizadores, eletricistas, mecânicos, técnicos e profissionais locais.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,155 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'watson.manuel.eta@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Admin collection
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Professional profiles
+    match /professionals/{profId} {
+      // Anyone signed in can view professionals
+      allow read: if isSignedIn();
+      // Professional creates or updates their profile
+      allow create: if isSignedIn() && (request.auth.uid == profId || request.auth.uid == request.resource.data.userId);
+      // Professional can update details, but only admin can verify/suspend unless status remains unchanged
+      allow update: if isSignedIn() && (
+        isAdmin() || 
+        (
+          request.auth.uid == profId && 
+          request.resource.data.status == resource.data.status
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Categories
+    match /categories/{categoryId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Service Requests
+    match /service_requests/{requestId} {
+      // Customer, assigned professional, or admin can read
+      allow read: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.customerId == request.auth.uid ||
+        resource.data.professionalId == request.auth.uid ||
+        resource.data.professionalId == '' ||
+        resource.data.status == 'pendente'
+      );
+      // Customer creates request
+      allow create: if isSignedIn() && request.resource.data.customerId == request.auth.uid;
+      // Customer or assigned professional or admin can update status
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.customerId == request.auth.uid ||
+        resource.data.professionalId == request.auth.uid ||
+        (resource.data.professionalId == '' && request.resource.data.professionalId == request.auth.uid)
+      );
+      allow delete: if isAdmin();
+
+      // Messages subcollection for live chat in a service request
+      match /messages/{messageId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && (
+          request.resource.data.senderId == request.auth.uid
+        );
+        allow update: if isSignedIn() && (
+          resource.data.recipientId == request.auth.uid || isAdmin()
+        );
+        allow delete: if isAdmin();
+      }
+    }
+
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.customerId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Complaints
+    match /complaints/{complaintId} {
+      allow read: if isSignedIn() && (
+        isAdmin() || resource.data.userId == request.auth.uid
+      );
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.customerId == request.auth.uid ||
+        resource.data.professionalId == request.auth.uid
+      );
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || (
+        isSignedIn() && (
+          resource.data.customerId == request.auth.uid ||
+          resource.data.professionalId == request.auth.uid
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+    }
+
+    // Admin Settings
+    match /admin_settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

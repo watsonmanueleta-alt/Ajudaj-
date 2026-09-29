@@ -1,0 +1,258 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Utilizador do sistema AjudaJá (Cliente, Profissional ou Administrador)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "UID único do Firebase Auth" },
+        "name": { "type": "string", "description": "Nome completo" },
+        "email": { "type": "string", "format": "email", "description": "Endereço de email" },
+        "phone": { "type": "string", "description": "Número de telefone para contacto em Angola" },
+        "role": { "type": "string", "enum": ["cliente", "profissional", "administrador"], "description": "Função no sistema" },
+        "avatarUrl": { "type": "string", "description": "URL da foto de perfil" },
+        "province": { "type": "string", "description": "Província em Angola (ex: Luanda)" },
+        "city": { "type": "string", "description": "Município ou bairro" },
+        "address": { "type": "string", "description": "Endereço detalhado" },
+        "latitude": { "type": "number", "description": "Latitude GPS" },
+        "longitude": { "type": "number", "description": "Longitude GPS" },
+        "createdAt": { "type": "string", "description": "Data ISO de registo" },
+        "updatedAt": { "type": "string", "description": "Data ISO da última atualização" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Professional": {
+      "title": "Professional",
+      "description": "Perfil detalhado do prestador de serviço profissional",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID do utilizador correspondente" },
+        "fullName": { "type": "string", "description": "Nome civil" },
+        "businessName": { "type": "string", "description": "Nome comercial ou profissional" },
+        "phone": { "type": "string", "description": "Telefone profissional" },
+        "email": { "type": "string", "description": "Email de contacto" },
+        "avatarUrl": { "type": "string", "description": "Foto de perfil" },
+        "categoryId": { "type": "string", "description": "ID da categoria principal" },
+        "categoryName": { "type": "string", "description": "Nome legível da categoria" },
+        "subcategory": { "type": "string", "description": "Especialidade ou subcategoria" },
+        "description": { "type": "string", "description": "Biografia e serviços oferecidos" },
+        "experienceYears": { "type": "number", "description": "Anos de experiência no setor" },
+        "serviceArea": { "type": "string", "description": "Zonas de atendimento (ex: Luanda, Talatona, Kilamba)" },
+        "province": { "type": "string", "description": "Província principal" },
+        "city": { "type": "string", "description": "Município base" },
+        "latitude": { "type": "number", "description": "Latitude GPS da base" },
+        "longitude": { "type": "number", "description": "Longitude GPS da base" },
+        "availability": { "type": "string", "enum": ["disponivel", "ocupado", "indisponivel"], "description": "Estado de disponibilidade atual" },
+        "basePrice": { "type": "number", "description": "Preço base de diagnóstico/visita em Kwanzas (Kz)" },
+        "status": { "type": "string", "enum": ["pendente", "verificado", "rejeitado", "suspenso"], "description": "Estado de verificação documental" },
+        "rating": { "type": "number", "description": "Classificação média ponderada de 1 a 5" },
+        "reviewCount": { "type": "number", "description": "Total de avaliações recebidas" },
+        "completedJobsCount": { "type": "number", "description": "Total de pedidos concluídos com sucesso" },
+        "documentsUrl": { "type": "string", "description": "URL dos documentos de verificação submetidos" },
+        "createdAt": { "type": "string", "description": "Data de registo" },
+        "updatedAt": { "type": "string", "description": "Data de atualização" }
+      },
+      "required": ["userId", "fullName", "categoryId", "status", "availability"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Categoria de serviços no AjudaJá",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identificador único da categoria" },
+        "name": { "type": "string", "description": "Nome da categoria" },
+        "slug": { "type": "string", "description": "Identificador slug url-friendly" },
+        "icon": { "type": "string", "description": "Nome do ícone Lucide" },
+        "description": { "type": "string", "description": "Descrição breve do tipo de serviço" },
+        "subcategories": { "type": "string", "description": "Subcategorias separadas por vírgula ou JSON" },
+        "isActive": { "type": "boolean", "description": "Estado ativo no catálogo" },
+        "order": { "type": "number", "description": "Ordem de exibição" }
+      },
+      "required": ["id", "name", "slug", "icon", "isActive"]
+    },
+    "ServiceRequest": {
+      "title": "ServiceRequest",
+      "description": "Pedido de serviço solicitado por um cliente",
+      "type": "object",
+      "properties": {
+        "customerId": { "type": "string", "description": "UID do cliente solicitante" },
+        "customerName": { "type": "string", "description": "Nome do cliente" },
+        "customerPhone": { "type": "string", "description": "Telefone do cliente" },
+        "professionalId": { "type": "string", "description": "UID do profissional atribuído" },
+        "professionalName": { "type": "string", "description": "Nome do profissional" },
+        "categoryId": { "type": "string", "description": "ID da categoria do serviço" },
+        "categoryName": { "type": "string", "description": "Nome da categoria" },
+        "title": { "type": "string", "description": "Título resumo do pedido" },
+        "description": { "type": "string", "description": "Descrição detalhada do problema" },
+        "province": { "type": "string", "description": "Província onde o serviço será executado" },
+        "city": { "type": "string", "description": "Município ou bairro" },
+        "address": { "type": "string", "description": "Endereço ou ponto de referência" },
+        "latitude": { "type": "number", "description": "Latitude GPS do local do serviço" },
+        "longitude": { "type": "number", "description": "Longitude GPS do local do serviço" },
+        "scheduledDate": { "type": "string", "description": "Data agendada (YYYY-MM-DD)" },
+        "scheduledTime": { "type": "string", "description": "Hora agendada (HH:MM)" },
+        "estimatedBudget": { "type": "number", "description": "Orçamento estimado em Kwanzas (Kz)" },
+        "finalPrice": { "type": "number", "description": "Valor final acordado ou cobrado em Kz" },
+        "notes": { "type": "string", "description": "Observações adicionais do cliente" },
+        "status": {
+          "type": "string",
+          "enum": ["pendente", "aceito", "a_caminho", "em_andamento", "concluido", "cancelado"],
+          "description": "Estado do fluxo de trabalho do pedido"
+        },
+        "cancellationReason": { "type": "string", "description": "Motivo do cancelamento se aplicável" },
+        "isRated": { "type": "boolean", "description": "Indica se já foi avaliado pelo cliente" },
+        "createdAt": { "type": "string", "description": "Timestamp de criação" },
+        "updatedAt": { "type": "string", "description": "Timestamp da última atualização" }
+      },
+      "required": ["customerId", "customerName", "categoryId", "description", "status"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Mensagem do chat entre cliente e profissional em um pedido",
+      "type": "object",
+      "properties": {
+        "requestId": { "type": "string", "description": "ID do pedido de serviço relacionado" },
+        "senderId": { "type": "string", "description": "UID do remetente" },
+        "senderName": { "type": "string", "description": "Nome legível do remetente" },
+        "senderRole": { "type": "string", "enum": ["cliente", "profissional", "administrador"], "description": "Função do remetente" },
+        "recipientId": { "type": "string", "description": "UID do destinatário" },
+        "text": { "type": "string", "description": "Conteúdo da mensagem de texto" },
+        "read": { "type": "boolean", "description": "Flag de confirmação de leitura" },
+        "createdAt": { "type": "string", "description": "Data e hora de envio" }
+      },
+      "required": ["requestId", "senderId", "recipientId", "text", "read"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Avaliação de serviço feito por cliente para um profissional",
+      "type": "object",
+      "properties": {
+        "requestId": { "type": "string", "description": "ID do pedido concluído" },
+        "customerId": { "type": "string", "description": "UID do cliente que avaliou" },
+        "customerName": { "type": "string", "description": "Nome do cliente" },
+        "professionalId": { "type": "string", "description": "UID do profissional avaliado" },
+        "rating": { "type": "number", "description": "Nota de 1 a 5 estrelas" },
+        "comment": { "type": "string", "description": "Comentário detalhado da experiência" },
+        "createdAt": { "type": "string", "description": "Data da avaliação" }
+      },
+      "required": ["requestId", "customerId", "professionalId", "rating"]
+    },
+    "Complaint": {
+      "title": "Complaint",
+      "description": "Reclamação ou disputa aberta sobre um pedido de serviço",
+      "type": "object",
+      "properties": {
+        "requestId": { "type": "string", "description": "ID do pedido associado" },
+        "userId": { "type": "string", "description": "UID do reclamante" },
+        "userName": { "type": "string", "description": "Nome do reclamante" },
+        "userRole": { "type": "string", "enum": ["cliente", "profissional"], "description": "Função do reclamante" },
+        "reason": { "type": "string", "description": "Motivo da reclamação" },
+        "description": { "type": "string", "description": "Explicação pormenorizada do sucedido" },
+        "status": {
+          "type": "string",
+          "enum": ["aberta", "em_analise", "resolvida", "encerrada"],
+          "description": "Estado de resolução da disputa"
+        },
+        "adminNotes": { "type": "string", "description": "Parecer ou notas da equipa de suporte/admin" },
+        "createdAt": { "type": "string", "description": "Data de abertura" },
+        "updatedAt": { "type": "string", "description": "Data da última atualização" }
+      },
+      "required": ["requestId", "userId", "reason", "description", "status"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Transação financeira e comissão vinculada a um serviço",
+      "type": "object",
+      "properties": {
+        "requestId": { "type": "string", "description": "ID do pedido de serviço" },
+        "customerId": { "type": "string", "description": "UID do cliente pagador" },
+        "professionalId": { "type": "string", "description": "UID do profissional recebedor" },
+        "amount": { "type": "number", "description": "Valor total do serviço em Kz" },
+        "commissionRate": { "type": "number", "description": "Taxa percentual de comissão aplicada (ex: 10 para 10%)" },
+        "commissionAmount": { "type": "number", "description": "Valor da comissão retida em Kz" },
+        "professionalEarnings": { "type": "number", "description": "Valor líquido repassado ao profissional em Kz" },
+        "paymentMethod": { "type": "string", "description": "Método de pagamento (ex: Multicaixa Express, Transferência, Dinheiro, etc.)" },
+        "status": {
+          "type": "string",
+          "enum": ["pendente", "processando", "pago", "falhou", "cancelado", "reembolsado"],
+          "description": "Estado da transação financeira"
+        },
+        "referenceCode": { "type": "string", "description": "Código de referência ou comprovativo" },
+        "createdAt": { "type": "string", "description": "Data de registo" },
+        "updatedAt": { "type": "string", "description": "Data de alteração" }
+      },
+      "required": ["requestId", "amount", "commissionRate", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Notificação no app para os utilizadores",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID do destinatário da notificação" },
+        "title": { "type": "string", "description": "Título da notificação" },
+        "message": { "type": "string", "description": "Texto informativo" },
+        "type": { "type": "string", "description": "Tipo de evento (pedido, status, chat, alerta, admin)" },
+        "requestId": { "type": "string", "description": "ID do pedido relacionado, se houver" },
+        "read": { "type": "boolean", "description": "Indica se já foi visualizada" },
+        "createdAt": { "type": "string", "description": "Data de envio" }
+      },
+      "required": ["userId", "title", "message", "read"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Configurações gerais da plataforma AjudaJá",
+      "type": "object",
+      "properties": {
+        "commissionRate": { "type": "number", "description": "Percentagem de comissão por serviço (ex: 10)" },
+        "currency": { "type": "string", "description": "Moeda de exibição (Kz / AOA)" },
+        "contactPhone": { "type": "string", "description": "Telefone de suporte em Angola" },
+        "contactEmail": { "type": "string", "description": "Email de suporte" },
+        "supportedProvinces": { "type": "string", "description": "Lista de províncias suportadas" },
+        "autoVerifyProfessionals": { "type": "boolean", "description": "Aprovação automática ou manual" }
+      },
+      "required": ["commissionRate", "currency"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Registo de utilizadores da plataforma"
+    },
+    "/professionals/{profId}": {
+      "schema": "Professional",
+      "description": "Perfis detalhados dos profissionais prestadores de serviço"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Catálogo de categorias de serviço disponíveis"
+    },
+    "/service_requests/{requestId}": {
+      "schema": "ServiceRequest",
+      "description": "Pedidos de serviço efetuados por clientes"
+    },
+    "/service_requests/{requestId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Mensagens de conversação associadas a cada pedido"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Avaliações e classificações de serviços concluídos"
+    },
+    "/complaints/{complaintId}": {
+      "schema": "Complaint",
+      "description": "Reclamações e suporte sobre pedidos"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Histórico e estados de pagamentos e comissões"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Notificações internas de cada utilizador"
+    },
+    "/admin_settings/{settingId}": {
+      "schema": "AdminSettings",
+      "description": "Configurações operacionais e financeiras da plataforma"
+    }
+  }
+}
