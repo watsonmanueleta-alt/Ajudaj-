@@ -54,6 +54,7 @@ export const ServiceRequestsView: React.FC<ServiceRequestsViewProps> = ({
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedPayPayRequest, setSelectedPayPayRequest] = useState<ServiceRequest | null>(null);
+  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
 
   const filteredRequests = requests.filter((r) => {
     if (filter === 'active') {
@@ -85,7 +86,6 @@ export const ServiceRequestsView: React.FC<ServiceRequestsViewProps> = ({
   };
 
   const handleCancelRequest = async (requestId: string) => {
-    if (!window.confirm('Tem a certeza de que deseja cancelar este pedido?')) return;
     setUpdatingId(requestId);
     try {
       await updateDoc(doc(db, 'service_requests', requestId), {
@@ -93,6 +93,7 @@ export const ServiceRequestsView: React.FC<ServiceRequestsViewProps> = ({
         cancellationReason: 'Cancelado pelo cliente',
         updatedAt: new Date().toISOString(),
       });
+      setCancelConfirmId(null);
       onRequestStatusUpdated();
     } catch (e) {
       console.error('Erro ao cancelar pedido:', e);
@@ -306,13 +307,32 @@ export const ServiceRequestsView: React.FC<ServiceRequestsViewProps> = ({
 
                     {/* Cancel button if still pending */}
                     {req.status === 'pendente' && (
-                      <button
-                        onClick={() => handleCancelRequest(req.id)}
-                        disabled={updatingId === req.id}
-                        className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline px-2 py-1"
-                      >
-                        Cancelar Pedido
-                      </button>
+                      cancelConfirmId === req.id ? (
+                        <div className="flex items-center gap-1.5 bg-rose-50 px-2 py-1 rounded-lg border border-rose-200">
+                          <span className="text-[11px] text-rose-800 font-semibold">Cancelar?</span>
+                          <button
+                            onClick={() => handleCancelRequest(req.id)}
+                            disabled={updatingId === req.id}
+                            className="text-[11px] font-bold text-white bg-rose-600 hover:bg-rose-700 px-2 py-0.5 rounded cursor-pointer transition-colors"
+                          >
+                            Sim
+                          </button>
+                          <button
+                            onClick={() => setCancelConfirmId(null)}
+                            className="text-[11px] font-medium text-slate-600 hover:text-slate-800 px-1.5 py-0.5 rounded cursor-pointer"
+                          >
+                            Não
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setCancelConfirmId(req.id)}
+                          disabled={updatingId === req.id}
+                          className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline px-2 py-1 cursor-pointer"
+                        >
+                          Cancelar Pedido
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
